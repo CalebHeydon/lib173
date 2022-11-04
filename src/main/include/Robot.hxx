@@ -2,9 +2,21 @@
 
 #include <frc/TimedRobot.h>
 
+#include "lib173/Looper.hxx"
+
 class Robot : public frc::TimedRobot
 {
+private:
+    Looper mLooper;
+
 public:
+    enum Mode
+    {
+        DISABLED,
+        AUTONOMOUS,
+        TELEOP
+    };
+
     void RobotInit() override;
     void RobotPeriodic() override;
     void AutonomousInit() override;
