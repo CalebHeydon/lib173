@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <mutex>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -14,8 +14,8 @@ class StateEstimator : public Loop
 private:
     static std::shared_ptr<StateEstimator> instance;
 
-    std::unique_ptr<frc::DifferentialDriveOdometry> mOdometry;
-    std::mutex mOdometryMutex;
+    std::unique_ptr<frc::DifferentialDrivePoseEstimator> mPoseEstimator;
+    std::mutex mPoseEstimatorMutex;
     std::shared_ptr<Drivetrain> mDrivetrain;
 
 public:
