@@ -12,7 +12,7 @@ std::shared_ptr<StateEstimator> StateEstimator::instance;
 
 StateEstimator::StateEstimator()
 {
-    mPoseEstimator = std::make_unique<frc::DifferentialDrivePoseEstimator>(frc::Rotation2d{}, frc::Pose2d{}, Constants::kStateStdDevs, Constants::kLocalMeasurementStdDevs, Constants::kvisionMeasurementStdDevs);
+    mPoseEstimator = std::make_unique<frc::DifferentialDrivePoseEstimator>(frc::Rotation2d{}, frc::Pose2d{}, Constants::kStateStdDevs, Constants::kLocalMeasurementStdDevs, Constants::kvisionMeasurementStdDevs, units::second_t{Constants::kLoopDt});
 }
 
 void StateEstimator::setDrivetrain(std::shared_ptr<Drivetrain> drivetrain)
@@ -30,8 +30,8 @@ void StateEstimator::reset(frc::Pose2d position, frc::Rotation2d heading)
 void StateEstimator::update(double timestamp)
 {
     frc::Rotation2d heading;
-    units::meters_per_second_t leftVelocity, rightVelocity;
-    units::meter_t leftDistance, rightDistance;
+    units::meters_per_second_t leftVelocity{0}, rightVelocity{0};
+    units::meter_t leftDistance{0}, rightDistance{0};
 
     if (mDrivetrain)
     {

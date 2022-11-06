@@ -17,7 +17,7 @@ void Robot::RobotInit()
 void Robot::RobotPeriodic()
 {
     frc::Pose2d position = StateEstimator::getInstance()->position();
-    std::cout << "x: " << position.X().value() << ", y: " << position.Y().value() << ", theta: " << position.Rotation().Radians().value() << ", rate: " << StateEstimator::getInstance()->rate() << "\n";
+    std::cout << "x: " << position.X().value() << ", y: " << position.Y().value() << ", theta: " << position.Rotation().Radians().value() << ", rate: " << mLooper.rate() << "\n";
 }
 
 void Robot::AutonomousInit()

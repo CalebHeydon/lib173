@@ -5,8 +5,10 @@
 #include <memory>
 #include <mutex>
 #include <frc/Timer.h>
+#include <thread>
 
 #include "Loop.hxx"
+#include "../Constants.hxx"
 
 class Looper
 {
@@ -15,12 +17,17 @@ private:
 
 public:
     bool mQuit;
+    double mLastTimestamp;
     std::vector<std::shared_ptr<Loop>> mLoops;
     std::mutex mLoopsMutex;
+    double mRate;
+    std::mutex mRateMutex;
 
     Looper()
     {
         mQuit = false;
+        mLastTimestamp = -1;
+        mRate = -1;
     }
 
     ~Looper()
@@ -46,12 +53,33 @@ public:
                                   {
                                     while (!this->mQuit)
                                     {
-                                        double currentTime = (double) frc::Timer::GetFPGATimestamp().value();
+                                        double currentTime = frc::Timer::GetFPGATimestamp().value();
+                                        if (mLastTimestamp == -1)
+                                            mLastTimestamp = currentTime;
+                                        double dt = currentTime - mLastTimestamp;
+                                        mLastTimestamp = currentTime;
+
+                                        mRateMutex.lock();
+                                        mRate = 1 / dt;
+                                        mRateMutex.unlock();
 
                                         this->mLoopsMutex.lock();
                                             for (std::shared_ptr<Loop> loop : mLoops)
-                                                loop->_update(currentTime);
+                                                loop->update(currentTime);
                                         this->mLoopsMutex.unlock();
+
+                                        double waitTime = Constants::kLoopDt - dt;
+                                        if (waitTime < 0)
+                                            continue;
+                                        std::this_thread::sleep_for(std::chrono::minutes{10l});
                                     } });
+    }
+
+    double rate()
+    {
+        mRateMutex.lock();
+        double rate = mRate;
+        mRateMutex.unlock();
+        return rate;
     }
 };
