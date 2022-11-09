@@ -12,8 +12,6 @@
 class StateEstimator : public Loop
 {
 private:
-    static std::shared_ptr<StateEstimator> instance;
-
     std::unique_ptr<frc::DifferentialDrivePoseEstimator> mPoseEstimator;
     std::mutex mPoseEstimatorMutex;
     std::shared_ptr<Drivetrain> mDrivetrain;
@@ -21,8 +19,7 @@ private:
 public:
     static std::shared_ptr<StateEstimator> getInstance()
     {
-        if (!instance)
-            instance = std::make_shared<StateEstimator>();
+        static std::shared_ptr<StateEstimator> instance = std::make_shared<StateEstimator>();
         return instance;
     }
 
@@ -31,5 +28,6 @@ public:
     void setDrivetrain(std::shared_ptr<Drivetrain> drivetrain);
     void reset(frc::Pose2d position, frc::Rotation2d heading);
     void update(double timestamp) override;
+    void updateVision(frc::Pose2d position, double timestamp);
     frc::Pose2d position();
 };

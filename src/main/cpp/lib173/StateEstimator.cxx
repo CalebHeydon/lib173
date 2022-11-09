@@ -8,11 +8,9 @@
 #include "lib173/Drivetrain.hxx"
 #include "Constants.hxx"
 
-std::shared_ptr<StateEstimator> StateEstimator::instance;
-
 StateEstimator::StateEstimator()
 {
-    mPoseEstimator = std::make_unique<frc::DifferentialDrivePoseEstimator>(frc::Rotation2d{}, frc::Pose2d{}, Constants::kStateStdDevs, Constants::kLocalMeasurementStdDevs, Constants::kvisionMeasurementStdDevs, units::second_t{Constants::kLoopDt});
+    mPoseEstimator = std::make_unique<frc::DifferentialDrivePoseEstimator>(frc::Rotation2d{}, frc::Pose2d{}, Constants::kStateStdDevs, Constants::kLocalMeasurementStdDevs, Constants::kVisionMeasurementStdDevs, units::second_t{Constants::kLoopDt});
 }
 
 void StateEstimator::setDrivetrain(std::shared_ptr<Drivetrain> drivetrain)
@@ -44,6 +42,13 @@ void StateEstimator::update(double timestamp)
 
     mPoseEstimatorMutex.lock();
     mPoseEstimator->Update(heading, frc::DifferentialDriveWheelSpeeds{leftVelocity, rightVelocity}, leftDistance, rightDistance);
+    mPoseEstimatorMutex.unlock();
+}
+
+void StateEstimator::updateVision(frc::Pose2d position, double timestamp)
+{
+    mPoseEstimatorMutex.lock();
+    mPoseEstimator->AddVisionMeasurement(position, units::second_t{timestamp});
     mPoseEstimatorMutex.unlock();
 }
 
