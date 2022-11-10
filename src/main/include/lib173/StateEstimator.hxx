@@ -17,10 +17,10 @@ private:
     std::shared_ptr<Drivetrain> mDrivetrain;
 
 public:
-    static std::shared_ptr<StateEstimator> getInstance()
+    static std::shared_ptr<StateEstimator> instance()
     {
-        static std::shared_ptr<StateEstimator> instance = std::make_shared<StateEstimator>();
-        return instance;
+        static std::shared_ptr<StateEstimator> stateEstimator = std::make_shared<StateEstimator>();
+        return stateEstimator;
     }
 
     StateEstimator();

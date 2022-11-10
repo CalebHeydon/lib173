@@ -8,7 +8,7 @@
 
 void Robot::RobotInit()
 {
-    std::shared_ptr<StateEstimator> stateEstimator = StateEstimator::getInstance();
+    std::shared_ptr<StateEstimator> stateEstimator = StateEstimator::instance();
     mLooper.add(stateEstimator);
 
     mLooper.run();
@@ -16,7 +16,7 @@ void Robot::RobotInit()
 
 void Robot::RobotPeriodic()
 {
-    frc::Pose2d position = StateEstimator::getInstance()->position();
+    frc::Pose2d position = StateEstimator::instance()->position();
     std::cout << "x: " << position.X().value() << ", y: " << position.Y().value() << ", theta: " << position.Rotation().Radians().value() << ", rate: " << mLooper.rate() << "\n";
 }
 
