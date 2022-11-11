@@ -10,8 +10,9 @@ void Robot::RobotInit()
 {
     std::shared_ptr<StateEstimator> stateEstimator = StateEstimator::instance();
     mLooper.add(stateEstimator);
-
-    mLooper.run();
+    AddPeriodic([this]
+                { mLooper.update(); },
+                units::second_t{Constants::kLoopDt});
 }
 
 void Robot::RobotPeriodic()

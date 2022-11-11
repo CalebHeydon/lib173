@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <frc/Notifier.h>
 #include <vector>
 #include <mutex>
 #include <frc/Timer.h>
@@ -11,9 +10,6 @@
 
 class Looper
 {
-private:
-    std::unique_ptr<frc::Notifier> mNotifier;
-
 public:
     double mLastTimestamp;
     std::vector<std::shared_ptr<Loop>> mLoops;
@@ -34,30 +30,22 @@ public:
         mLoopsMutex.unlock();
     }
 
-    void run()
+    void update()
     {
-        mNotifier = std::make_unique<frc::Notifier>(0, [this]
-                                                    {
-            double currentTimestamp = frc::Timer::GetFPGATimestamp().value();
-            if (mLastTimestamp == -1)
-                mLastTimestamp = currentTimestamp;
-            double dt = currentTimestamp - mLastTimestamp;
+        double currentTimestamp = frc::Timer::GetFPGATimestamp().value();
+        if (mLastTimestamp == -1)
             mLastTimestamp = currentTimestamp;
+        double dt = currentTimestamp - mLastTimestamp;
+        mLastTimestamp = currentTimestamp;
 
-            mRateMutex.lock();
-            mRate = 1 / dt;
-            mRateMutex.unlock();
+        mRateMutex.lock();
+        mRate = 1 / dt;
+        mRateMutex.unlock();
 
-            this->mLoopsMutex.lock();
-            for (std::shared_ptr<Loop> loop : mLoops)
-                loop->update(currentTimestamp);
-            this->mLoopsMutex.unlock(); });
-        mNotifier->StartPeriodic(units::second_t{Constants::kLoopDt});
-    }
-
-    void stop()
-    {
-        mNotifier->Stop();
+        this->mLoopsMutex.lock();
+        for (std::shared_ptr<Loop> loop : mLoops)
+            loop->update(currentTimestamp);
+        this->mLoopsMutex.unlock();
     }
 
     double rate()
