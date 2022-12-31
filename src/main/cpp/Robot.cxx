@@ -21,8 +21,13 @@ void Robot::RobotInit()
     stateEstimator->reset(frc::Pose2d{});
 
     mVision = std::make_shared<RageVision>();
+<<<<<<< HEAD
     mVision->run(Constants::kVisionDataPort, [stateEstimator](double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency) {});
     mVisionInitialized = false;
+=======
+    mVisionInitialized = mVision->sync(Constants::kVisionIp, frc::Timer::GetFPGATimestamp().value()) == -1 ? false : true;
+    mVision->run(Constants::kVisionDataPort, [](double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency) {});
+>>>>>>> 6961289df1c1457c3e7c65470782421b294c01b4
 }
 
 void Robot::RobotPeriodic()
