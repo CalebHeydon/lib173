@@ -18,8 +18,8 @@ void Robot::RobotInit()
                 units::second_t{Constants::kLoopDt});
 
     mVision = std::make_shared<RageVision>();
+    mVisionInitialized = mVision->sync(Constants::kVisionIp, frc::Timer::GetFPGATimestamp().value()) == -1 ? false : true;
     mVision->run(Constants::kVisionDataPort, [](double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency) {});
-    mVisionInitialized = false;
 }
 
 void Robot::RobotPeriodic()
