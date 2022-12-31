@@ -14,13 +14,6 @@ private:
     bool mVisionInitialized;
 
 public:
-    enum Mode
-    {
-        DISABLED,
-        AUTONOMOUS,
-        TELEOP
-    };
-
     void RobotInit() override;
     void RobotPeriodic() override;
     void AutonomousInit() override;

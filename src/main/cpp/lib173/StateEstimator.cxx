@@ -11,17 +11,22 @@
 StateEstimator::StateEstimator()
 {
     mPoseEstimator = std::make_unique<frc::DifferentialDrivePoseEstimator>(frc::Rotation2d{}, frc::Pose2d{}, Constants::kStateStdDevs, Constants::kLocalMeasurementStdDevs, Constants::kVisionMeasurementStdDevs, units::second_t{Constants::kLoopDt});
+    mDrivetrain = nullptr;
 }
 
 void StateEstimator::setDrivetrain(std::shared_ptr<Drivetrain> drivetrain)
 {
+    mPoseEstimatorMutex.lock();
     mDrivetrain = drivetrain;
+    mPoseEstimatorMutex.unlock();
 }
 
-void StateEstimator::reset(frc::Pose2d position, frc::Rotation2d heading)
+void StateEstimator::reset(frc::Pose2d pose)
 {
     mPoseEstimatorMutex.lock();
-    mPoseEstimator->ResetPosition(position, heading);
+    mPoseEstimator->ResetPosition(pose, mDrivetrain ? frc::Rotation2d{units::radian_t{mDrivetrain->heading()}} : frc::Rotation2d{});
+    if (mDrivetrain)
+        mDrivetrain->resetEncoders();
     mPoseEstimatorMutex.unlock();
 }
 
@@ -30,6 +35,8 @@ void StateEstimator::update(double timestamp)
     frc::Rotation2d heading;
     units::meters_per_second_t leftVelocity{0}, rightVelocity{0};
     units::meter_t leftDistance{0}, rightDistance{0};
+
+    mPoseEstimatorMutex.lock();
 
     if (mDrivetrain)
     {
@@ -40,23 +47,22 @@ void StateEstimator::update(double timestamp)
         rightDistance = units::meter_t{mDrivetrain->rightDistance()};
     }
 
-    mPoseEstimatorMutex.lock();
     mPoseEstimator->Update(heading, frc::DifferentialDriveWheelSpeeds{leftVelocity, rightVelocity}, leftDistance, rightDistance);
     mPoseEstimatorMutex.unlock();
 }
 
-void StateEstimator::updateVision(frc::Pose2d position, double timestamp)
+void StateEstimator::updateVision(frc::Pose2d pose, double timestamp)
 {
     mPoseEstimatorMutex.lock();
-    mPoseEstimator->AddVisionMeasurement(position, units::second_t{timestamp});
+    mPoseEstimator->AddVisionMeasurement(pose, units::second_t{timestamp});
     mPoseEstimatorMutex.unlock();
 }
 
-frc::Pose2d StateEstimator::position()
+frc::Pose2d StateEstimator::pose()
 {
     mPoseEstimatorMutex.lock();
-    frc::Pose2d position = mPoseEstimator->GetEstimatedPosition();
+    frc::Pose2d pose = mPoseEstimator->GetEstimatedPosition();
     mPoseEstimatorMutex.unlock();
 
-    return position;
+    return pose;
 }

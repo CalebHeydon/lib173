@@ -26,8 +26,8 @@ public:
     StateEstimator();
 
     void setDrivetrain(std::shared_ptr<Drivetrain> drivetrain);
-    void reset(frc::Pose2d position, frc::Rotation2d heading);
+    void reset(frc::Pose2d pose);
     void update(double timestamp) override;
-    void updateVision(frc::Pose2d position, double timestamp);
-    frc::Pose2d position();
+    void updateVision(frc::Pose2d pose, double timestamp);
+    frc::Pose2d pose();
 };

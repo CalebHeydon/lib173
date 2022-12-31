@@ -17,8 +17,11 @@ void Robot::RobotInit()
                 { mLooper.update(); },
                 units::second_t{Constants::kLoopDt});
 
+    stateEstimator->setDrivetrain(nullptr);
+    stateEstimator->reset(frc::Pose2d{});
+
     mVision = std::make_shared<RageVision>();
-    mVision->run(Constants::kVisionDataPort, [](double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency) {});
+    mVision->run(Constants::kVisionDataPort, [stateEstimator](double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency) {});
     mVisionInitialized = false;
 }
 
@@ -27,8 +30,8 @@ void Robot::RobotPeriodic()
     if (!mVisionInitialized)
         mVisionInitialized = mVision->sync(Constants::kVisionIp, frc::Timer::GetFPGATimestamp().value()) == -1 ? false : true;
 
-    frc::Pose2d position = StateEstimator::instance()->position();
-    std::cout << "x: " << position.X().value() << ", y: " << position.Y().value() << ", theta: " << position.Rotation().Radians().value() << ", rate: " << mLooper.rate() << "\n";
+    frc::Pose2d pose = StateEstimator::instance()->pose();
+    std::cout << "x: " << pose.X().value() << ", y: " << pose.Y().value() << ", theta: " << pose.Rotation().Radians().value() << ", rate: " << mLooper.rate() << "\n";
 }
 
 void Robot::AutonomousInit()

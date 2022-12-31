@@ -94,6 +94,8 @@
     "fstream": "cpp",
     "future": "cpp",
     "iomanip": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "xhash": "cpp",
+    "*.inc": "cpp"
   }
 }
