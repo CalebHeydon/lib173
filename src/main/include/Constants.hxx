@@ -12,6 +12,8 @@ public:
     static inline wpi::array<double, 3> kLocalMeasurementStdDevs{0.1, 0.1, 0.1};
     static inline wpi::array<double, 3> kVisionMeasurementStdDevs{0.1, 0.1, 0.1};
 
+    static constexpr double kDrivetrainWidth = 0.5;
+
     static constexpr double kRamseteB = 2.0;
     static constexpr double kRamseteZeta = 0.7;
     static constexpr double kRamseteToleranceX = 0.05;

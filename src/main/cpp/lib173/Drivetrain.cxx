@@ -5,12 +5,16 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 
 #include "Constants.hxx"
 #include "lib173/StateEstimator.hxx"
 
 Drivetrain::Drivetrain()
 {
+    mKinematics = std::make_shared<frc::DifferentialDriveKinematics>(units::meter_t{Constants::kDrivetrainWidth});
+
     mRamseteController = std::make_shared<frc::RamseteController>(Constants::kRamseteB, Constants::kRamseteZeta);
     mRamseteController->SetTolerance(frc::Pose2d{units::meter_t{Constants::kRamseteToleranceX}, units::meter_t{Constants::kRamseteTolaranceY}, frc::Rotation2d{}});
 
@@ -80,9 +84,9 @@ void Drivetrain::update(double timestamp)
 
         double time = timestamp - mPathFollowingTimestamp;
         frc::Trajectory::State goal = mTrajectory->Sample(units::second_t{time});
-
-        frc::ChassisSpeeds wheelSpeeds = mRamseteController->Calculate(stateEstimator->pose(), goal);
-        driveVelocity(wheelSpeeds.vx.value(), wheelSpeeds.vy.value());
+        frc::ChassisSpeeds adjustedSpeeds = mRamseteController->Calculate(stateEstimator->pose(), goal);
+        frc::DifferentialDriveWheelSpeeds wheelSpeeds = mKinematics->ToWheelSpeeds(adjustedSpeeds);
+        driveVelocity(wheelSpeeds.left.value(), wheelSpeeds.right.value());
     }
 
     mTrajectoryMutex.unlock();

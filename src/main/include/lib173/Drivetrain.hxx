@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/controller/RamseteController.h>
 #include <frc/trajectory/Trajectory.h>
 #include <mutex>
@@ -10,6 +11,7 @@
 class Drivetrain : public Loop
 {
 private:
+    std::shared_ptr<frc::DifferentialDriveKinematics> mKinematics;
     std::shared_ptr<frc::RamseteController> mRamseteController;
     double mPathFollowingTimestamp;
 
